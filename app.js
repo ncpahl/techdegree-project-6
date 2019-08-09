@@ -1,5 +1,6 @@
 const qwerty = document.getElementById('qwerty');
 const phrase = document.getElementById('phrase');
+const overlay = document.getElementById('overlay');
 let missed = 0;
 
 
@@ -14,9 +15,8 @@ const phrases = [
 
 //start game - remove overlay
 const start = document.querySelector('.btn__reset');
-const overlay = document.getElementById('overlay');
 
-start.addEventListener('click', (e) =>{
+start.addEventListener('click', () =>{
   overlay.style.display = 'none';
 });
 
@@ -59,14 +59,80 @@ function checkLetter(e) {
 
   for (let i = 0; i < letter.length; i += 1){
     if (e.textContent === letter[i].textContent) {
-      li[i].className = 'show';
-      match = li[i];
+      letter[i].classList.add('show');
+      letter[i].style.transition = "all 2s";
+      match = true;
     }
   }
   return match;
 }
 
-qwerty.addEventListener('click', (e) =>{
-  const button 
-  overlay.style.display = 'none';
+
+
+//check if winning or losing
+
+function checkWin() {
+  const letters = document.getElementsByClassName('letter').length; //count letters class
+  const showLetters = document.getElementsByClassName('show').length; //count show class
+  const title = document.querySelector('.title'); // overlay title
+  const reset = document.querySelector('.btn__reset'); //button text
+
+  console.log(letters);
+  console.log(showLetters);
+
+  if (letters === showLetters) {
+    overlay.setAttribute('class', 'win'); //change overlay class
+    title.textContent = 'You Win!'; //change title text
+    reset.textContent = 'Try Again'; //change button text
+    overlay.style.display = ''; // show overlay
+
+    //refresh browswer
+    reset.addEventListener('click', () =>{
+      location.reload();
+    });
+  }
+
+  if (missed === 5) {
+    overlay.setAttribute('class', 'lose'); //change overlay class
+    title.textContent = 'Sorry'; //change title text
+    reset.textContent = 'Try Again'; //change button text
+    overlay.style.display = ''; // show overlay
+
+    //refresh browswer
+    reset.addEventListener('click', () =>{
+      location.reload();
+    });
+
+  }
+  }
+
+//keyboard guesses
+
+qwerty.addEventListener('click', e => {
+  let letterFound = checkLetter(e.target); //letter in button
+
+  if (e.target.tagName == 'BUTTON'){ //choose button only not div
+    e.target.classList.add('chosen'); // change class name to chosen
+    e.target.disabled = true; // turn off key selected
+
+        //scoreboard
+          if (letterFound === null) {
+            missed += 1; //update score
+            let heart = document.querySelector("img[src='images/liveHeart.png']"); // heart image
+            let lost = document.createElement('img'); // lost heart image
+
+            //replace heart for misses
+            lost.setAttribute('src','images/lostHeart.png');
+            lost.setAttribute('height','35px');
+            lost.setAttribute('width','30px');
+            heart.replaceWith(lost);
+
+            console.log(missed);
+          }
+      }
+
+
+    checkWin();
+
+
 });
